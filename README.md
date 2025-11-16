@@ -1,77 +1,566 @@
-# Deployment and DevOps for MERN Applications
+# Deployment and DevOps Essentials - Week 7 Assignment
 
-This assignment focuses on deploying a full MERN stack application to production, implementing CI/CD pipelines, and setting up monitoring for your application.
+This repository contains a fully deployed MERN stack real-time chat application with CI/CD pipelines, production-ready configurations, and comprehensive monitoring setup.
 
-## Assignment Overview
+## Live Application URLs
 
-You will:
-1. Prepare your MERN application for production deployment
-2. Deploy the backend to a cloud platform
-3. Deploy the frontend to a static hosting service
-4. Set up CI/CD pipelines with GitHub Actions
-5. Implement monitoring and maintenance strategies
+- **Frontend (Vercel)**: [Add your Vercel URL here after deployment]
+- **Backend (Railway)**: [Add your Railway URL here after deployment]
+- **Database**: MongoDB Atlas
 
-## Getting Started
+## Table of Contents
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Follow the setup instructions in the `Week7-Assignment.md` file
-4. Use the provided templates and configuration files as a starting point
+1. [Application Overview](#application-overview)
+2. [Architecture](#architecture)
+3. [Prerequisites](#prerequisites)
+4. [Local Development Setup](#local-development-setup)
+5. [MongoDB Atlas Setup](#mongodb-atlas-setup)
+6. [Backend Deployment (Railway)](#backend-deployment-railway)
+7. [Frontend Deployment (Vercel)](#frontend-deployment-vercel)
+8. [CI/CD Pipeline](#cicd-pipeline)
+9. [Environment Variables](#environment-variables)
+10. [Monitoring and Maintenance](#monitoring-and-maintenance)
+11. [Troubleshooting](#troubleshooting)
 
-## Files Included
+## Application Overview
 
-- `Week7-Assignment.md`: Detailed assignment instructions
-- `.github/workflows/`: GitHub Actions workflow templates
-- `deployment/`: Deployment configuration files and scripts
-- `.env.example`: Example environment variable templates
-- `monitoring/`: Monitoring configuration examples
+A real-time chat application with the following features:
+- User authentication (register/login)
+- Real-time messaging using Socket.io
+- Multiple chat rooms (public and private)
+- Private messaging between users
+- Message reactions
+- Typing indicators
+- Online/offline status
+- Message persistence with MongoDB
 
-## Requirements
+### Tech Stack
 
-- A completed MERN stack application from previous weeks
-- Accounts on the following services:
-  - GitHub
-  - MongoDB Atlas
-  - Render, Railway, or Heroku (for backend)
-  - Vercel, Netlify, or GitHub Pages (for frontend)
-- Basic understanding of CI/CD concepts
+**Backend:**
+- Node.js & Express.js
+- Socket.io for real-time communication
+- MongoDB with Mongoose ODM
+- Helmet for security headers
+- Express rate limiting
+- CORS configuration
 
-## Deployment Platforms
+**Frontend:**
+- React 18
+- Vite for fast development and optimized builds
+- Socket.io client
+- Modern CSS with responsive design
 
-### Backend Deployment Options
-- **Render**: Easy to use, free tier available
-- **Railway**: Developer-friendly, generous free tier
-- **Heroku**: Well-established, extensive documentation
+## Architecture
 
-### Frontend Deployment Options
-- **Vercel**: Optimized for React apps, easy integration
-- **Netlify**: Great for static sites, good CI/CD
-- **GitHub Pages**: Free, integrated with GitHub
+```
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│   Vercel    │────────▶│   Railway   │────────▶│   MongoDB   │
+│  (Frontend) │         │  (Backend)  │         │    Atlas    │
+│   React +   │         │  Express +  │         │             │
+│   Vite      │         │  Socket.io  │         │             │
+└─────────────┘         └─────────────┘         └─────────────┘
+       │                       │
+       │                       │
+       └───────────────────────┘
+         WebSocket Connection
+```
+
+## Prerequisites
+
+Before deploying, ensure you have:
+
+- [x] Node.js 18+ installed
+- [x] Git installed and configured
+- [x] GitHub account
+- [x] MongoDB Atlas account (free tier available)
+- [x] Railway account (linked to GitHub)
+- [x] Vercel account (linked to GitHub)
+
+## Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repository-url>
+   cd deployment-and-devops-essentials-MUNENE1212
+   ```
+
+2. **Install server dependencies**
+   ```bash
+   cd server
+   npm install
+   ```
+
+3. **Install client dependencies**
+   ```bash
+   cd ../client
+   npm install
+   ```
+
+4. **Configure environment variables**
+
+   Create `server/.env`:
+   ```env
+   PORT=5000
+   CLIENT_URL=http://localhost:5173
+   MONGODB_URI=mongodb://localhost:27017/realtime-chat
+   NODE_ENV=development
+   ```
+
+   Create `client/.env`:
+   ```env
+   VITE_SOCKET_URL=http://localhost:5000
+   ```
+
+5. **Start the development servers**
+
+   Terminal 1 (Backend):
+   ```bash
+   cd server
+   npm run dev
+   ```
+
+   Terminal 2 (Frontend):
+   ```bash
+   cd client
+   npm run dev
+   ```
+
+6. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:5000
+
+## MongoDB Atlas Setup
+
+### Step 1: Create a MongoDB Atlas Account
+
+1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+2. Sign up for a free account
+3. Create a new organization (if needed)
+
+### Step 2: Create a Cluster
+
+1. Click "Build a Database"
+2. Choose the **FREE** shared tier (M0)
+3. Select a cloud provider and region closest to your Railway deployment
+4. Name your cluster (e.g., "chat-app-cluster")
+5. Click "Create Cluster"
+
+### Step 3: Configure Database Access
+
+1. In the left sidebar, click "Database Access"
+2. Click "Add New Database User"
+3. Choose "Password" authentication
+4. Create a username and strong password (save these!)
+5. Set "Database User Privileges" to "Read and write to any database"
+6. Click "Add User"
+
+### Step 4: Configure Network Access
+
+1. In the left sidebar, click "Network Access"
+2. Click "Add IP Address"
+3. Click "Allow Access from Anywhere" (0.0.0.0/0)
+   - This is necessary for Railway and Vercel to connect
+4. Click "Confirm"
+
+### Step 5: Get Connection String
+
+1. Click "Database" in the left sidebar
+2. Click "Connect" on your cluster
+3. Choose "Connect your application"
+4. Select "Node.js" and version "4.1 or later"
+5. Copy the connection string
+6. Replace `<password>` with your database user password
+7. Replace `myFirstDatabase` with your desired database name (e.g., `realtime-chat`)
+
+Example:
+```
+mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/realtime-chat?retryWrites=true&w=majority
+```
+
+## Backend Deployment (Railway)
+
+### Step 1: Prepare Your Repository
+
+Ensure your code is pushed to GitHub:
+```bash
+git add .
+git commit -m "Prepare for deployment"
+git push origin main
+```
+
+### Step 2: Deploy to Railway
+
+1. Go to [Railway](https://railway.app)
+2. Sign in with your GitHub account
+3. Click "New Project"
+4. Select "Deploy from GitHub repo"
+5. Choose your repository
+6. Railway will detect it's a Node.js application
+
+### Step 3: Configure Root Directory
+
+1. Click on your service
+2. Go to "Settings"
+3. Under "Build & Deploy", set:
+   - **Root Directory**: `server`
+   - **Build Command**: (leave empty, Railway auto-detects)
+   - **Start Command**: `node server.js`
+
+### Step 4: Add Environment Variables
+
+1. Go to the "Variables" tab
+2. Add the following variables:
+
+```env
+PORT=5000
+NODE_ENV=production
+MONGODB_URI=<your-mongodb-atlas-connection-string>
+CLIENT_URL=https://your-vercel-app.vercel.app
+```
+
+**Important:** Leave `CLIENT_URL` as a placeholder for now. You'll update it after deploying the frontend.
+
+### Step 5: Deploy
+
+1. Railway will automatically deploy your backend
+2. Once deployed, copy your Railway URL (e.g., `https://your-app.railway.app`)
+3. Save this URL - you'll need it for the frontend
+
+### Step 6: Test the Backend
+
+Visit your Railway URL in a browser. You should see:
+```
+Socket.io Chat Server with MongoDB is running
+```
+
+Test the health endpoint:
+```
+https://your-app.railway.app/health
+```
+
+## Frontend Deployment (Vercel)
+
+### Step 1: Deploy to Vercel
+
+1. Go to [Vercel](https://vercel.com)
+2. Sign in with your GitHub account
+3. Click "Add New Project"
+4. Import your GitHub repository
+5. Configure the project:
+
+   - **Framework Preset**: Vite
+   - **Root Directory**: `client`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+
+### Step 2: Add Environment Variables
+
+1. In the "Environment Variables" section, add:
+
+```env
+VITE_SOCKET_URL=https://your-railway-app.railway.app
+```
+
+Replace with your actual Railway URL from the backend deployment.
+
+### Step 3: Deploy
+
+1. Click "Deploy"
+2. Wait for the deployment to complete
+3. Vercel will provide you with a URL (e.g., `https://your-app.vercel.app`)
+
+### Step 4: Update Backend Environment
+
+1. Go back to Railway
+2. Update the `CLIENT_URL` environment variable with your Vercel URL:
+   ```env
+   CLIENT_URL=https://your-app.vercel.app
+   ```
+3. Railway will automatically redeploy
+
+### Step 5: Test the Application
+
+1. Visit your Vercel URL
+2. Register a new account
+3. Start chatting!
+4. Open another browser/incognito window to test real-time features
 
 ## CI/CD Pipeline
 
-The assignment includes templates for setting up GitHub Actions workflows:
-- `frontend-ci.yml`: Tests and builds the React application
-- `backend-ci.yml`: Tests the Express.js backend
-- `frontend-cd.yml`: Deploys the frontend to your chosen platform
-- `backend-cd.yml`: Deploys the backend to your chosen platform
+This project includes three GitHub Actions workflows:
 
-## Submission
+### 1. Backend CI/CD (`backend-ci-cd.yml`)
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+- **Triggers**: Push or PR to `main`/`develop` affecting `server/` files
+- **Jobs**:
+  - Installs dependencies
+  - Checks for syntax errors
+  - Deploys to Railway (on main branch)
 
-1. Complete all deployment tasks
-2. Set up CI/CD pipelines with GitHub Actions
-3. Deploy both frontend and backend to production
-4. Document your deployment process in the README.md
-5. Include screenshots of your CI/CD pipeline in action
-6. Add URLs to your deployed applications
+### 2. Frontend CI/CD (`frontend-ci-cd.yml`)
 
-## Resources
+- **Triggers**: Push or PR to `main`/`develop` affecting `client/` files
+- **Jobs**:
+  - Installs dependencies
+  - Builds the application
+  - Verifies build output
+  - Deploys to Vercel (on main branch)
 
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [MongoDB Atlas Documentation](https://docs.atlas.mongodb.com/)
-- [Render Documentation](https://render.com/docs)
-- [Railway Documentation](https://docs.railway.app/)
-- [Vercel Documentation](https://vercel.com/docs)
-- [Netlify Documentation](https://docs.netlify.com/) 
+### 3. Full Stack CI (`full-stack-ci.yml`)
+
+- **Triggers**: Push or PR to `main`/`develop`
+- **Jobs**:
+  - Code quality checks
+  - Security audits
+  - Integration tests
+
+### Viewing CI/CD Status
+
+1. Go to your GitHub repository
+2. Click the "Actions" tab
+3. View workflow runs and their status
+4. Green checkmarks indicate successful builds
+
+### CI/CD Pipeline Screenshots
+
+After deployment, you can view your CI/CD pipeline status:
+
+![GitHub Actions Workflows](./docs/screenshots/github-actions.png)
+
+## Environment Variables
+
+### Server Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `PORT` | Server port | `5000` |
+| `NODE_ENV` | Environment | `production` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb+srv://...` |
+| `CLIENT_URL` | Frontend URL for CORS | `https://app.vercel.app` |
+
+### Client Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `VITE_SOCKET_URL` | Backend WebSocket URL | `https://app.railway.app` |
+
+## Monitoring and Maintenance
+
+### Health Check Endpoint
+
+The backend includes a health check endpoint at `/health`:
+
+```bash
+curl https://your-railway-app.railway.app/health
+```
+
+Response:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-11-16T...",
+  "uptime": 12345.67,
+  "environment": "production"
+}
+```
+
+### Monitoring Setup
+
+#### Railway Monitoring
+
+1. Go to your Railway project
+2. Click "Observability" tab
+3. View:
+   - CPU usage
+   - Memory usage
+   - Network traffic
+   - Logs
+
+#### Vercel Analytics
+
+1. Go to your Vercel project
+2. Click "Analytics" tab
+3. View:
+   - Page views
+   - User sessions
+   - Performance metrics
+
+### Error Tracking (Optional)
+
+For production error tracking, consider integrating:
+- [Sentry](https://sentry.io) for error monitoring
+- [LogRocket](https://logrocket.com) for session replay
+- [Datadog](https://www.datadoghq.com) for comprehensive monitoring
+
+### Database Backups
+
+MongoDB Atlas provides automatic backups:
+1. Go to your cluster in Atlas
+2. Click "Backup" tab
+3. Backups are taken automatically in the free tier
+4. Configure backup schedule for paid tiers
+
+### Maintenance Checklist
+
+- [ ] Monitor application logs regularly
+- [ ] Check health endpoint weekly
+- [ ] Review MongoDB Atlas metrics
+- [ ] Update dependencies monthly (`npm audit`)
+- [ ] Review and rotate secrets quarterly
+- [ ] Test backup restoration procedures
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. Socket.io Connection Failed
+
+**Symptom**: Frontend can't connect to backend
+
+**Solutions**:
+- Verify `VITE_SOCKET_URL` in Vercel matches your Railway URL
+- Check Railway logs for errors
+- Ensure Railway service is running
+- Verify CORS configuration in server
+
+#### 2. MongoDB Connection Error
+
+**Symptom**: Backend fails to start, database errors in logs
+
+**Solutions**:
+- Verify MongoDB Atlas connection string is correct
+- Check MongoDB Atlas network access (allow 0.0.0.0/0)
+- Ensure database user has proper permissions
+- Check if your IP is whitelisted in Atlas
+
+#### 3. Build Failures
+
+**Symptom**: GitHub Actions or deployment fails
+
+**Solutions**:
+- Check Node.js version compatibility (use 18+)
+- Verify all dependencies are in `package.json`
+- Review build logs for specific errors
+- Ensure environment variables are set correctly
+
+#### 4. CORS Errors
+
+**Symptom**: Browser console shows CORS policy errors
+
+**Solutions**:
+- Update `CLIENT_URL` in Railway to match Vercel URL exactly
+- Ensure no trailing slashes in URLs
+- Check if CORS middleware is properly configured
+
+#### 5. WebSocket Upgrade Failed
+
+**Symptom**: WebSocket connection fails, falls back to polling
+
+**Solutions**:
+- Ensure Railway supports WebSocket connections (it does)
+- Check if any proxy/CDN is blocking WebSocket
+- Verify Socket.io client and server versions match
+
+### Viewing Logs
+
+**Railway Logs**:
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login
+railway login
+
+# View logs
+railway logs
+```
+
+**Vercel Logs**:
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Login
+vercel login
+
+# View logs
+vercel logs
+```
+
+### Getting Help
+
+- Check the [original chat app README](./CHAT_APP_README.md) for feature details
+- Review Railway documentation: https://docs.railway.app
+- Review Vercel documentation: https://vercel.com/docs
+- Check Socket.io documentation: https://socket.io/docs/v4/
+
+## Rollback Procedures
+
+### Rolling Back Backend (Railway)
+
+1. Go to your Railway project
+2. Click on your service
+3. Go to "Deployments" tab
+4. Find the previous working deployment
+5. Click "..." menu and select "Redeploy"
+
+### Rolling Back Frontend (Vercel)
+
+1. Go to your Vercel project
+2. Click "Deployments" tab
+3. Find the previous working deployment
+4. Click "..." menu and select "Promote to Production"
+
+## Security Considerations
+
+This application implements several security measures:
+
+- **Helmet.js**: Secure HTTP headers
+- **Rate Limiting**: 100 requests per 15 minutes per IP
+- **CORS**: Restricted to specific origins
+- **Input Validation**: Username and password requirements
+- **Password Hashing**: bcryptjs for secure password storage
+- **Environment Variables**: Sensitive data not in code
+- **HTTPS**: Enforced by Vercel and Railway
+
+## Performance Optimizations
+
+- **Code Splitting**: Automatic with Vite
+- **Asset Caching**: Long-term caching for static assets
+- **Connection Pooling**: MongoDB connection pooling
+- **Gzip Compression**: Automatic on Vercel and Railway
+- **CDN**: Vercel Edge Network for global distribution
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Assignment Completion Checklist
+
+- [x] Application copied to Week 7 directory
+- [x] Production-ready backend with security headers
+- [x] Environment variable templates created
+- [x] Railway configuration files
+- [x] Vercel configuration files
+- [x] GitHub Actions CI/CD workflows
+- [x] Comprehensive README with deployment instructions
+- [ ] MongoDB Atlas cluster created
+- [ ] Backend deployed to Railway
+- [ ] Frontend deployed to Vercel
+- [ ] Environment variables configured
+- [ ] CI/CD pipeline tested
+- [ ] Application functioning in production
+- [ ] Screenshots of deployments added
+- [ ] Live URLs updated in README
+
+## License
+
+MIT License - Created for Week 7 MERN Stack Assignment
+
+## Author
+
+Created as part of the PLP MERN Stack course - Week 7: Deployment and DevOps Essentials

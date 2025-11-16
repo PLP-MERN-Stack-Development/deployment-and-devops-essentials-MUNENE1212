@@ -1,0 +1,204 @@
+.room-list {
+  width: 250px;
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+}
+
+.room-list-header {
+  padding: var(--space-5);
+  border-bottom: 2px solid var(--border-glow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-primary);
+}
+
+.room-list-header h3 {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  background: var(--gradient-neon);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.create-room-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--gradient-cyber);
+  color: var(--text-inverse);
+  border: none;
+  font-size: var(--text-xl);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  box-shadow: var(--glow-magenta);
+}
+
+.create-room-btn:hover {
+  transform: scale(1.15);
+  box-shadow: var(--glow-purple);
+}
+
+.room-sections {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-3);
+}
+
+.room-section {
+  margin-bottom: var(--space-5);
+}
+
+.room-section h4 {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: var(--space-3) var(--space-3) var(--space-1);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.room-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.room-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: var(--bg-primary);
+  border: 2px solid var(--border-light);
+  position: relative;
+}
+
+.room-item .invite-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: var(--card-hover);
+  color: var(--neon-purple);
+  border: 1px solid var(--neon-purple);
+  font-size: var(--text-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  opacity: 0;
+  margin-left: auto;
+}
+
+.room-item:hover .invite-btn {
+  opacity: 1;
+}
+
+.room-item .invite-btn:hover {
+  background: var(--neon-purple);
+  color: var(--text-inverse);
+  transform: scale(1.15);
+  box-shadow: var(--glow-purple);
+}
+
+.room-item:hover {
+  background: var(--card-hover);
+  border-color: var(--neon-cyan);
+  transform: translateX(5px);
+  box-shadow: var(--glow-cyan);
+}
+
+.room-item.active {
+  background: var(--gradient-cyber);
+  color: var(--text-inverse);
+  border-color: var(--neon-magenta);
+  box-shadow: var(--glow-magenta);
+}
+
+.room-item.active .room-name,
+.room-item.active .room-members {
+  color: var(--text-inverse);
+}
+
+.room-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--gradient-cyber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--text-xl);
+  color: var(--text-inverse);
+  box-shadow: var(--glow-purple);
+}
+
+.room-icon.private {
+  background: var(--gradient-neon);
+  font-size: var(--text-lg);
+}
+
+.room-item.active .room-icon {
+  background: var(--bg-primary);
+  color: var(--neon-magenta);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.room-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.room-name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.room-members {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .room-list {
+    width: 100%;
+    max-height: 150px;
+    border-right: none;
+    border-bottom: 1px solid #e1e8ed;
+  }
+
+  .room-sections {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+  }
+
+  .room-section {
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+
+  .room-items {
+    flex-direction: row;
+  }
+
+  .room-item {
+    min-width: 120px;
+  }
+}
