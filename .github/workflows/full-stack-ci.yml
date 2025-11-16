@@ -27,14 +27,14 @@ jobs:
       - name: Check server code
         working-directory: ./server
         run: |
-          npm ci
+          npm install
           node -c server.js
           echo "Server code check passed"
 
       - name: Check client code
         working-directory: ./client
         run: |
-          npm ci
+          npm install
           echo "Client dependencies installed"
 
       - name: Run security audit
@@ -58,11 +58,11 @@ jobs:
 
       - name: Install server dependencies
         working-directory: ./server
-        run: npm ci
+        run: npm install
 
       - name: Install client dependencies
         working-directory: ./client
-        run: npm ci
+        run: npm install
 
       - name: Build client
         working-directory: ./client
