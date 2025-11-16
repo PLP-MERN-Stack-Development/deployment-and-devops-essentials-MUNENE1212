@@ -5,7 +5,7 @@ This repository contains a fully deployed MERN stack real-time chat application 
 ## Live Application URLs
 
 - **Frontend (Vercel)**: [Add your Vercel URL here after deployment]
-- **Backend (Railway)**: [Add your Railway URL here after deployment]
+- **Backend (Render)**: [Add your Render URL here after deployment]
 - **Database**: MongoDB Atlas
 
 ## Table of Contents
@@ -15,7 +15,7 @@ This repository contains a fully deployed MERN stack real-time chat application 
 3. [Prerequisites](#prerequisites)
 4. [Local Development Setup](#local-development-setup)
 5. [MongoDB Atlas Setup](#mongodb-atlas-setup)
-6. [Backend Deployment (Railway)](#backend-deployment-railway)
+6. [Backend Deployment (Render)](#backend-deployment-render)
 7. [Frontend Deployment (Vercel)](#frontend-deployment-vercel)
 8. [CI/CD Pipeline](#cicd-pipeline)
 9. [Environment Variables](#environment-variables)
@@ -54,7 +54,7 @@ A real-time chat application with the following features:
 
 ```
 ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
-│   Vercel    │────────▶│   Railway   │────────▶│   MongoDB   │
+│   Vercel    │────────▶│   Render    │────────▶│   MongoDB   │
 │  (Frontend) │         │  (Backend)  │         │    Atlas    │
 │   React +   │         │  Express +  │         │             │
 │   Vite      │         │  Socket.io  │         │             │
@@ -73,7 +73,7 @@ Before deploying, ensure you have:
 - [x] Git installed and configured
 - [x] GitHub account
 - [x] MongoDB Atlas account (free tier available)
-- [x] Railway account (linked to GitHub)
+- [x] Render account (linked to GitHub)
 - [x] Vercel account (linked to GitHub)
 
 ## Local Development Setup
@@ -141,7 +141,7 @@ Before deploying, ensure you have:
 
 1. Click "Build a Database"
 2. Choose the **FREE** shared tier (M0)
-3. Select a cloud provider and region closest to your Railway deployment
+3. Select a cloud provider and region closest to your Render deployment
 4. Name your cluster (e.g., "chat-app-cluster")
 5. Click "Create Cluster"
 
@@ -159,7 +159,7 @@ Before deploying, ensure you have:
 1. In the left sidebar, click "Network Access"
 2. Click "Add IP Address"
 3. Click "Allow Access from Anywhere" (0.0.0.0/0)
-   - This is necessary for Railway and Vercel to connect
+   - This is necessary for Render and Vercel to connect
 4. Click "Confirm"
 
 ### Step 5: Get Connection String
@@ -177,7 +177,7 @@ Example:
 mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/realtime-chat?retryWrites=true&w=majority
 ```
 
-## Backend Deployment (Railway)
+## Backend Deployment (Render)
 
 ### Step 1: Prepare Your Repository
 
@@ -188,55 +188,61 @@ git commit -m "Prepare for deployment"
 git push origin main
 ```
 
-### Step 2: Deploy to Railway
+### Step 2: Deploy to Render
 
-1. Go to [Railway](https://railway.app)
+1. Go to [Render](https://render.com)
 2. Sign in with your GitHub account
-3. Click "New Project"
-4. Select "Deploy from GitHub repo"
-5. Choose your repository
-6. Railway will detect it's a Node.js application
+3. Click "New +" and select "Web Service"
+4. Connect your GitHub repository
+5. Render will detect it's a Node.js application
 
-### Step 3: Configure Root Directory
+### Step 3: Configure the Service
 
-1. Click on your service
-2. Go to "Settings"
-3. Under "Build & Deploy", set:
-   - **Root Directory**: `server`
-   - **Build Command**: (leave empty, Railway auto-detects)
-   - **Start Command**: `node server.js`
+Fill in the following settings:
+
+- **Name**: `chat-app-backend` (or your preferred name)
+- **Region**: Choose the closest region to you
+- **Branch**: `main`
+- **Root Directory**: `server`
+- **Runtime**: `Node`
+- **Build Command**: `npm install`
+- **Start Command**: `node server.js`
+- **Instance Type**: Select **Free** tier
 
 ### Step 4: Add Environment Variables
 
-1. Go to the "Variables" tab
-2. Add the following variables:
+Scroll down to the "Environment Variables" section and add:
 
-```env
-PORT=5000
-NODE_ENV=production
-MONGODB_URI=<your-mongodb-atlas-connection-string>
-CLIENT_URL=https://your-vercel-app.vercel.app
-```
+| Key | Value |
+|-----|-------|
+| `NODE_ENV` | `production` |
+| `PORT` | `5000` |
+| `MONGODB_URI` | `<your-mongodb-atlas-connection-string>` |
+| `CLIENT_URL` | `https://your-vercel-app.vercel.app` |
 
 **Important:** Leave `CLIENT_URL` as a placeholder for now. You'll update it after deploying the frontend.
 
 ### Step 5: Deploy
 
-1. Railway will automatically deploy your backend
-2. Once deployed, copy your Railway URL (e.g., `https://your-app.railway.app`)
-3. Save this URL - you'll need it for the frontend
+1. Click "Create Web Service"
+2. Render will automatically build and deploy your backend
+3. Wait for the deployment to complete (5-10 minutes for first deploy)
+4. Once deployed, copy your Render URL (e.g., `https://chat-app-backend.onrender.com`)
+5. Save this URL - you'll need it for the frontend
 
 ### Step 6: Test the Backend
 
-Visit your Railway URL in a browser. You should see:
+Visit your Render URL in a browser. You should see:
 ```
 Socket.io Chat Server with MongoDB is running
 ```
 
 Test the health endpoint:
 ```
-https://your-app.railway.app/health
+https://chat-app-backend.onrender.com/health
 ```
+
+**Note:** Render's free tier may spin down with inactivity. The first request after inactivity may take 30-60 seconds to respond.
 
 ## Frontend Deployment (Vercel)
 
@@ -258,10 +264,10 @@ https://your-app.railway.app/health
 1. In the "Environment Variables" section, add:
 
 ```env
-VITE_SOCKET_URL=https://your-railway-app.railway.app
+VITE_SOCKET_URL=https://your-render-app.onrender.com
 ```
 
-Replace with your actual Railway URL from the backend deployment.
+Replace with your actual Render URL from the backend deployment.
 
 ### Step 3: Deploy
 
@@ -271,12 +277,14 @@ Replace with your actual Railway URL from the backend deployment.
 
 ### Step 4: Update Backend Environment
 
-1. Go back to Railway
-2. Update the `CLIENT_URL` environment variable with your Vercel URL:
+1. Go back to Render
+2. Go to your web service dashboard
+3. Click on "Environment" in the left sidebar
+4. Update the `CLIENT_URL` environment variable with your Vercel URL:
    ```env
    CLIENT_URL=https://your-app.vercel.app
    ```
-3. Railway will automatically redeploy
+5. Render will automatically redeploy
 
 ### Step 5: Test the Application
 
@@ -295,7 +303,7 @@ This project includes three GitHub Actions workflows:
 - **Jobs**:
   - Installs dependencies
   - Checks for syntax errors
-  - Deploys to Railway (on main branch)
+  - Deploys to Render (on main branch)
 
 ### 2. Frontend CI/CD (`frontend-ci-cd.yml`)
 
@@ -342,7 +350,7 @@ After deployment, you can view your CI/CD pipeline status:
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `VITE_SOCKET_URL` | Backend WebSocket URL | `https://app.railway.app` |
+| `VITE_SOCKET_URL` | Backend WebSocket URL | `https://app.onrender.com` |
 
 ## Monitoring and Maintenance
 
@@ -351,7 +359,7 @@ After deployment, you can view your CI/CD pipeline status:
 The backend includes a health check endpoint at `/health`:
 
 ```bash
-curl https://your-railway-app.railway.app/health
+curl https://your-render-app.onrender.com/health
 ```
 
 Response:
@@ -366,15 +374,16 @@ Response:
 
 ### Monitoring Setup
 
-#### Railway Monitoring
+#### Render Monitoring
 
-1. Go to your Railway project
-2. Click "Observability" tab
-3. View:
+1. Go to your Render dashboard
+2. Click on your web service
+3. View the "Metrics" and "Logs" tabs to monitor:
    - CPU usage
    - Memory usage
    - Network traffic
-   - Logs
+   - Request logs
+   - Build logs
 
 #### Vercel Analytics
 
@@ -418,9 +427,9 @@ MongoDB Atlas provides automatic backups:
 **Symptom**: Frontend can't connect to backend
 
 **Solutions**:
-- Verify `VITE_SOCKET_URL` in Vercel matches your Railway URL
-- Check Railway logs for errors
-- Ensure Railway service is running
+- Verify `VITE_SOCKET_URL` in Vercel matches your Render URL
+- Check Render logs for errors
+- Ensure Render service is running (free tier may spin down after inactivity)
 - Verify CORS configuration in server
 
 #### 2. MongoDB Connection Error
@@ -448,7 +457,7 @@ MongoDB Atlas provides automatic backups:
 **Symptom**: Browser console shows CORS policy errors
 
 **Solutions**:
-- Update `CLIENT_URL` in Railway to match Vercel URL exactly
+- Update `CLIENT_URL` in Render to match Vercel URL exactly
 - Ensure no trailing slashes in URLs
 - Check if CORS middleware is properly configured
 
@@ -457,23 +466,18 @@ MongoDB Atlas provides automatic backups:
 **Symptom**: WebSocket connection fails, falls back to polling
 
 **Solutions**:
-- Ensure Railway supports WebSocket connections (it does)
+- Ensure Render supports WebSocket connections (it does)
 - Check if any proxy/CDN is blocking WebSocket
 - Verify Socket.io client and server versions match
+- Note: Free tier services may take time to wake up from sleep
 
 ### Viewing Logs
 
-**Railway Logs**:
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login
-railway login
-
-# View logs
-railway logs
-```
+**Render Logs**:
+1. Go to your Render dashboard
+2. Click on your web service
+3. Click "Logs" tab to view real-time logs
+4. Use the search feature to filter logs
 
 **Vercel Logs**:
 ```bash
@@ -490,19 +494,19 @@ vercel logs
 ### Getting Help
 
 - Check the [original chat app README](./CHAT_APP_README.md) for feature details
-- Review Railway documentation: https://docs.railway.app
+- Review Render documentation: https://render.com/docs
 - Review Vercel documentation: https://vercel.com/docs
 - Check Socket.io documentation: https://socket.io/docs/v4/
 
 ## Rollback Procedures
 
-### Rolling Back Backend (Railway)
+### Rolling Back Backend (Render)
 
-1. Go to your Railway project
-2. Click on your service
-3. Go to "Deployments" tab
-4. Find the previous working deployment
-5. Click "..." menu and select "Redeploy"
+1. Go to your Render dashboard
+2. Click on your web service
+3. Go to "Events" tab
+4. Find the previous successful deployment
+5. Click "Rollback to this version"
 
 ### Rolling Back Frontend (Vercel)
 
@@ -521,15 +525,16 @@ This application implements several security measures:
 - **Input Validation**: Username and password requirements
 - **Password Hashing**: bcryptjs for secure password storage
 - **Environment Variables**: Sensitive data not in code
-- **HTTPS**: Enforced by Vercel and Railway
+- **HTTPS**: Enforced by Vercel and Render
 
 ## Performance Optimizations
 
 - **Code Splitting**: Automatic with Vite
 - **Asset Caching**: Long-term caching for static assets
 - **Connection Pooling**: MongoDB connection pooling
-- **Gzip Compression**: Automatic on Vercel and Railway
+- **Gzip Compression**: Automatic on Vercel and Render
 - **CDN**: Vercel Edge Network for global distribution
+- **Auto-Sleep**: Render free tier sleeps after 15 minutes of inactivity (first request may be slow)
 
 ## Contributing
 
@@ -544,12 +549,12 @@ This application implements several security measures:
 - [x] Application copied to Week 7 directory
 - [x] Production-ready backend with security headers
 - [x] Environment variable templates created
-- [x] Railway configuration files
+- [x] Render configuration files
 - [x] Vercel configuration files
 - [x] GitHub Actions CI/CD workflows
 - [x] Comprehensive README with deployment instructions
 - [ ] MongoDB Atlas cluster created
-- [ ] Backend deployed to Railway
+- [ ] Backend deployed to Render
 - [ ] Frontend deployed to Vercel
 - [ ] Environment variables configured
 - [ ] CI/CD pipeline tested
