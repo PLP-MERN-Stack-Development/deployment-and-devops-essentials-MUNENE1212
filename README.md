@@ -4,9 +4,9 @@ This repository contains a fully deployed MERN stack real-time chat application 
 
 ## Live Application URLs
 
-- **Frontend (Vercel)**: [Add your Vercel URL here after deployment]
-- **Backend (Render)**: [Add your Render URL here after deployment]
-- **Database**: MongoDB Atlas
+- **Frontend (Vercel)**: https://deployment-and-devops-essentials-mu.vercel.app
+- **Backend (Render)**: https://chatapp1212.onrender.com
+- **Database**: MongoDB Atlas (Configured and Connected)
 
 ## Table of Contents
 
@@ -553,14 +553,15 @@ This application implements several security measures:
 - [x] Vercel configuration files
 - [x] GitHub Actions CI/CD workflows
 - [x] Comprehensive README with deployment instructions
-- [ ] MongoDB Atlas cluster created
-- [ ] Backend deployed to Render
-- [ ] Frontend deployed to Vercel
-- [ ] Environment variables configured
-- [ ] CI/CD pipeline tested
-- [ ] Application functioning in production
-- [ ] Screenshots of deployments added
-- [ ] Live URLs updated in README
+- [x] MongoDB Atlas cluster created
+- [x] Backend deployed to Render
+- [x] Frontend deployed to Vercel
+- [x] Environment variables configured
+- [x] CI/CD pipeline tested
+- [x] Application functioning in production
+- [x] Live URLs updated in README
+
+**Note**: Add screenshots of your deployments to complete documentation (optional)
 
 ## License
 
