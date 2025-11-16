@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-userSchema.index({ username: 1 });
+// Note: username already has an index from unique: true
 userSchema.index({ socketId: 1 });
 userSchema.index({ isOnline: 1 });
 
