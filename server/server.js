@@ -757,7 +757,7 @@ app.get('/health', (req, res) => {
 
 // Root route
 app.get('/', (req, res) => {
-  res.send('Socket.io Chat Server with MongoDB is running');
+  res.send('Socket.io Chat Server with MongoDB is running - Deployed on Render');
 });
 
 // Global error handler
